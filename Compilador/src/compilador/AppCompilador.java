@@ -1,5 +1,5 @@
 package compilador;
-import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -9,14 +9,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
 public class AppCompilador extends JFrame implements ActionListener{
 	// Componentes o Atributos
 	private JMenuBar barraMenu;
@@ -26,13 +21,17 @@ public class AppCompilador extends JFrame implements ActionListener{
 	private JFileChooser ventanaArchivos;
 	private File archivo;
 	private JTextArea areaTexto;
+	public NumeroLinea numLinea;
+	private JScrollPane barrita; 
 	private JList<String> tokens;
 	private JTabbedPane documentos,consola,tabla;
-	private String [] titulos ={"Tipo","Nombre","Valor"};
+	private String [] titulos ={"Tipo","Nombre","Valor","Alcance","Pocisión"};
 	DefaultTableModel modelo = new DefaultTableModel(new Object[0][0],titulos);
 	private JTable mitabla = new JTable(modelo);
 	private JButton btnAnalizar;
+	
 	public static void main(String[] args) {
+
 		/*try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 		} catch (Exception e) {
@@ -41,10 +40,11 @@ public class AppCompilador extends JFrame implements ActionListener{
 	}
 	public AppCompilador() {
 		super("Analizador Lexico y Sintáctico");
+		System.out.println("Iniciando...");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
 		setLayout(new GridLayout(2,2));
-		setSize(600,450);
+		setSize(800,600);
 		setLocationRelativeTo(null);
 		creaInterFaz();
 		setVisible(true);
@@ -84,10 +84,19 @@ public class AppCompilador extends JFrame implements ActionListener{
 		areaTexto = new JTextArea();
 		ventanaArchivos= new JFileChooser("Guardar");
 		areaTexto.setFont(new Font("Consolas", Font.PLAIN, 12));
+		
+		NumeroLinea lineNumber = new NumeroLinea(areaTexto);
+		barrita = new JScrollPane(areaTexto);
+		barrita.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		barrita.setPreferredSize(new Dimension(870, 65));
+		barrita.setRowHeaderView(lineNumber);
+		
 		documentos = new JTabbedPane();
 		consola = new JTabbedPane();
 		tabla = new JTabbedPane();
-		documentos.addTab("Nuevo", new JScrollPane(areaTexto));
+
+		
+		documentos.addTab("Nuevo", barrita);
 		documentos.setToolTipText("Aqui se muestra el codigo");
 		add(documentos);
 		tokens=new JList<String>();
@@ -108,15 +117,18 @@ public class AppCompilador extends JFrame implements ActionListener{
 				Analisis analisador = new Analisis(archivo.getAbsolutePath());
 				tokens.setListData(analisador.getmistokens().toArray( new String [0]));
 				modelo = new DefaultTableModel(new Object[0][0],titulos);
+				
+				
+				
 				mitabla.setModel(modelo);
-				for (int i = analisador.getIdenti().size()-1; i >=0; i--) {
-					Identificador id = analisador.getIdenti().get(i);
+				//for (int i = analisador.getTabla().size()-1; i >=0; i--) {
+				for (int i=0; i < analisador.getTabla().size(); i++) {
+					TabladeSimbolos id = analisador.getTabla().get(i);
 					if(!id.tipo.equals("")) {
-						Object datostabla[]= {id.tipo,id.nombre,id.valor};
+						Object datostabla[]= {id.tipo,id.nombre,id.valor,id.alcance,id.renglon};
 						modelo.addRow(datostabla);
 					}
 				}
-
 			}
 		
 			return;
