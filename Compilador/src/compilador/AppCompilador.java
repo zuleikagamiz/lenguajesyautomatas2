@@ -11,7 +11,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
 public class AppCompilador extends JFrame implements ActionListener{
 	// Componentes o Atributos
 	private JMenuBar barraMenu;
@@ -24,9 +23,12 @@ public class AppCompilador extends JFrame implements ActionListener{
 	public NumeroLinea numLinea;
 	private JScrollPane barrita; 
 	private JList<String> tokens;
-	private JTabbedPane documentos,consola,tabla;
+	private JTabbedPane documentos,consola,tabla,tabla2;
+	private String [] titulos2 ={"Operador","Operando 1°","Operando 2°","Resultado"};
+	DefaultTableModel modelo2 = new DefaultTableModel(new Object[0][0],titulos2);
 	private String [] titulos ={"Tipo","Nombre","Valor","Alcance","Pocisión"};
 	DefaultTableModel modelo = new DefaultTableModel(new Object[0][0],titulos);
+	private JTable mitabla2 = new JTable(modelo2);
 	private JTable mitabla = new JTable(modelo);
 	private JButton btnAnalizar;
 	
@@ -44,7 +46,7 @@ public class AppCompilador extends JFrame implements ActionListener{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
 		setLayout(new GridLayout(2,2));
-		setSize(800,600);
+		setSize(1200,700);
 		setLocationRelativeTo(null);
 		creaInterFaz();
 		setVisible(true);
@@ -68,7 +70,7 @@ public class AppCompilador extends JFrame implements ActionListener{
 		itemAnalisLexico  = new JMenuItem("Analizar codigo");
 		itemAnalisLexico.addActionListener(this);
 		btnAnalizar = new JButton("ANALIZAR");
-		btnAnalizar.setFont(new Font("Dialog",Font.PLAIN,40));
+		btnAnalizar.setFont(new Font("Dialog",Font.PLAIN,30));
 		btnAnalizar.addActionListener(this);
 		
 		
@@ -94,6 +96,7 @@ public class AppCompilador extends JFrame implements ActionListener{
 		documentos = new JTabbedPane();
 		consola = new JTabbedPane();
 		tabla = new JTabbedPane();
+		tabla2 = new JTabbedPane();
 
 		
 		documentos.addTab("Nuevo", barrita);
@@ -102,10 +105,13 @@ public class AppCompilador extends JFrame implements ActionListener{
 		tokens=new JList<String>();
 		consola.addTab("Consola",new JScrollPane(tokens));
 		//consola.addTab("Tabla",new JScrollPane(mitabla));
+		tabla2.addTab("Cuadruplos",new JScrollPane(mitabla2) );
 		tabla.addTab("Tabla de simbolos",new JScrollPane(mitabla) );
 		add(consola);
 		consola.setToolTipText("Aqui se muestra el resultado del analisis");
+		
 		add(btnAnalizar);
+		add (tabla2);
 		add(tabla);
 		//documentos.add("Analizar", btnAnalizar);
 
@@ -117,11 +123,10 @@ public class AppCompilador extends JFrame implements ActionListener{
 				Analisis analisador = new Analisis(archivo.getAbsolutePath());
 				tokens.setListData(analisador.getmistokens().toArray( new String [0]));
 				modelo = new DefaultTableModel(new Object[0][0],titulos);
-				
+				modelo2 = new DefaultTableModel(new Object[0][0],titulos2);
 				
 				
 				mitabla.setModel(modelo);
-				//for (int i = analisador.getTabla().size()-1; i >=0; i--) {
 				for (int i=0; i < analisador.getTabla().size(); i++) {
 					TabladeSimbolos id = analisador.getTabla().get(i);
 					if(!id.tipo.equals("")) {
@@ -129,6 +134,22 @@ public class AppCompilador extends JFrame implements ActionListener{
 						modelo.addRow(datostabla);
 					}
 				}
+				mitabla2.setModel(modelo2);
+				for (int i=0; i < analisador.getTabla2().size(); i++) {
+					Operaciones id2 =analisador.getTabla2().get(i);							
+							Object datostabla2[]= {id2.operador,id2.argumento1,id2.argumento2,id2.resultado};
+						modelo2.addRow(datostabla2);
+						
+						if(id2.operador.equals("=")){
+							Object datostabla3[]= {" "," "," "," "," "};
+							modelo2.addRow(datostabla3);
+						}
+						
+				}
+				
+						
+				
+				
 			}
 		
 			return;

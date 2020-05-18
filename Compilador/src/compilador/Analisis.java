@@ -20,6 +20,9 @@ public class Analisis
 	public ArrayList<TabladeSimbolos> getTabla() {
 		return tablasimbolos ;
 	}
+	public ArrayList<Operaciones> getTabla2() {
+		return opera ;
+	}
 	
 	
 	public Analisis(String ruta) {//Recibe el nombre del archivo de texto
@@ -33,7 +36,7 @@ public class Analisis
 		if(impresion.get(impresion.size()-1).equals("¡No hay errores lexicos!"))
 			impresion.add("¡No hay errores sintacticos!");
 		if(impresion.get(impresion.size()-1).equals("¡No hay errores sintacticos!"))
-			impresion.add("¡No hay errores sintacticos!");
+			impresion.add("¡No hay errores semanticos!");
 			//impresion.add();
 		
 		for (int i = 0; i < tablasimbolos.size(); i++) {
